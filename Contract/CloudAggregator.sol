@@ -132,11 +132,12 @@ contract SimplePaymentChannel is ChainlinkClient {
 
     // retrieve one the unfinished(!= succeeded) state task
     // cause the returns should not return structure, so I use 2 arrays to return
-    function retrieveOneUnfinishedTask() external returns (string[] dockerImage, string[] transactionId){
+    function retrieveOneUnfinishedTask() external returns (string[] dockerImage, string[] port , string[] transactionId){
         for (uint index = 0; index < consumers.length; index++) {
             for (uint j = 0; j < customerToTransactions[consumers[index]].length; j++) {
                 if (customerToTransactions[consumers[index]][j].state != State.Succeeded) {
                     dockerImage.push(customerToTransactions[consumers[index]][j].jobs.dockerImage);
+                    port.push(customerToTransactions[consumers[index]][j].jobs.port);
                     transactionId.push(customerToTransactions[consumers[index]][j].transactionId);
                 }
             }
