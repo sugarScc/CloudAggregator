@@ -17,7 +17,8 @@ contract SimplePaymentChannel is ChainlinkClient {
         string dockerImage;
         // Liveness Probe(port + message), see LivenessProbe in Kubernetes
         string port;
-        string flagMessage;
+        // the chainlink will always return bytes32, so we just store the bytes32 one
+        bytes32 flagMessage;
         string url;
 
         //IP address of the docker instance
@@ -43,43 +44,34 @@ contract SimplePaymentChannel is ChainlinkClient {
         uint creationTimeStamp;
     }
 
+    //customer to transactions
     mapping(address => Transaction[]) customerToTransactions;
+    // transactionId to transaction
     mapping(uint => Transaction) tidToTransaction;
+    //requestId to Transaction
+    mapping(bytes32 => uint) requestIdToTransactionId;
+
     // array below will be used to iterate above mapping
     address[] consumers;
 
 
-    constructor (address payable recipientAddress)
-    payable
+    constructor ()
     {
         // set Chainlink configuration(to enable a HTTP-GET request later)
         setPublicChainlinkToken();
-        oracle = 0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8;
-        jobId = "d5270d1c311941d0b08bead21fea7747";
-        fee = 0.1 * 10 ** 18;
-
-
-        Transaction transaction;
-        transaction.customer = msg.sender;
-
-        sender = payable(msg.sender);
-        recipient = recipientAddress;
-        // block.timestamp is the current block in seconds since the epoch
-        // only after 24H and the task is not finished, the customer could take back his/her deposit
-        expiration = block.timestamp + 24 * 60 * 60;
     }
 
     // customer calls this function to publish task
     function publishTask(
-        string dockerImage,
-        string port,
-        string flagMessage,
-        string url,
-    //TODO change this param into decentralized type
+        string calldata dockerImage,
+        string calldata port,
+        bytes32  flagMessage,
+        string calldata url,
+    //TODO change this param(creationTimestamp) into decentralized type
         uint creationTimestamp
     ) external payable {
-        Transaction transaction;
-        transaction.customer = msg.sender;
+        Transaction memory transaction;
+        transaction.customer = payable(msg.sender);
         transaction.money = msg.value;
         transaction.state = State.Waiting;
         transaction.jobs.dockerImage = dockerImage;
@@ -95,6 +87,7 @@ contract SimplePaymentChannel is ChainlinkClient {
         // init reverse index
         tidToTransaction[transaction.transactionId] = transaction;
 
+
         //add consumer to the address[] consumers
         if (customerToTransactions[msg.sender].length != 0) {
             consumers.push(msg.sender);
@@ -103,99 +96,125 @@ contract SimplePaymentChannel is ChainlinkClient {
 
     // retrieve tasksInfo from a target user
     // to reduce gas, this function need to be called by client as iterator
-    function retrieveTasksInfoFromTargetUser(address consumerAddress, uint index) external returns (
-        string transactionId,
+    function retrieveTasksInfoFromTargetUser(address consumerAddress, uint index) external view returns (
+        uint transactionId,
     // we need to reflect this value manually in our client
         State state,
-        string dockerImage,
-        string port,
-        string flagMessage,
-        string url,
+        string memory dockerImage,
+        string memory port,
+        bytes32 flagMessage,
+        string memory url,
         uint creationTimeStamp
     ){
         //check the length
         require(index < customerToTransactions[consumerAddress].length);
 
-        return (customerToTransactions[consumerAddress][index].transactionId,
-        customerToTransactions[consumerAddress][index].state,
-        customerToTransactions[consumerAddress][index].jobs.dockerImage,
-        customerToTransactions[consumerAddress][index].jobs.port,
-        customerToTransactions[consumerAddress][index].jobs.flagMessage,
-        customerToTransactions[consumerAddress][index].jobs.url,
-        customerToTransactions[consumerAddress][index].creationTimeStamp);
+        Transaction memory transaction = customerToTransactions[consumerAddress][index];
+
+        return (transaction.transactionId,
+        transaction.state,
+        transaction.jobs.dockerImage,
+        transaction.jobs.port,
+        transaction.jobs.flagMessage,
+        transaction.jobs.url,
+        transaction.creationTimeStamp);
     }
 
     //related to above function
-    function getUserTasksLength(address consumerAddress) external returns (uint index){
+    function getUserTasksLength(address consumerAddress) external view returns (uint index){
         return customerToTransactions[consumerAddress].length;
     }
 
     // retrieve one the unfinished(!= succeeded) state task
     // cause the returns should not return structure, so I use 2 arrays to return
-    function retrieveOneUnfinishedTask() external returns (string[] dockerImage, string[] port , string[] transactionId){
+    function retrieveOneUnfinishedTask() external view returns (
+        string[] memory dockerImages,
+        string[] memory ports,
+        uint[] memory transactionIds){
+        uint total = 0;
         for (uint index = 0; index < consumers.length; index++) {
             for (uint j = 0; j < customerToTransactions[consumers[index]].length; j++) {
                 if (customerToTransactions[consumers[index]][j].state != State.Succeeded) {
-                    dockerImage.push(customerToTransactions[consumers[index]][j].jobs.dockerImage);
-                    port.push(customerToTransactions[consumers[index]][j].jobs.port);
-                    transactionId.push(customerToTransactions[consumers[index]][j].transactionId);
+                    total++;
                 }
             }
         }
-        return;
+
+        dockerImages = new string[](total);
+        ports = new string[](total);
+        transactionIds = new uint[](total);
+        uint flag = 0;
+        for (uint index = 0; index < consumers.length; index++) {
+            for (uint j = 0; j < customerToTransactions[consumers[index]].length; j++) {
+                if (customerToTransactions[consumers[index]][j].state != State.Succeeded) {
+                    dockerImages[flag] = customerToTransactions[consumers[index]][j].jobs.dockerImage;
+                    ports[flag] = customerToTransactions[consumers[index]][j].jobs.port;
+                    transactionIds[flag] = customerToTransactions[consumers[index]][j].transactionId;
+                }
+            }
+        }
+
+        return (dockerImages, ports, transactionIds);
     }
 
 
     // customer calls this function and return the money to customer
     function returnMoneyBack(uint transactionId) external payable {
         // find this transaction
-        Transaction[] transactions = customerToTransactions[msg.sender];
+        Transaction[] memory transactions = customerToTransactions[msg.sender];
+        Transaction memory transaction;
         uint transactionsLength = transactions.length;
         uint index = 0;
         while (index < transactionsLength) {
-            if (transactions[i].transactionId == transactionId) {
-                break;
+            if (transactions[index].transactionId == transactionId) {
+                transaction = transactions[index];
             }
             index++;
         }
         // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>24H)
         //TODO change the block.time into real-world time using chainlink
-        require(block.time > transactions[index].creationTimeStamp + 24 * 60 * 60);
+        require(block.timestamp > transaction.creationTimeStamp + 24 * 60 * 60);
         // check the status of this task
-        require(transactions[index].state != State.Succeeded);
+        require(transaction.state != State.Succeeded);
 
-        payable(msg.sender).transfer();
+        payable(msg.sender).transfer(transaction.money);
     }
 
     // cloud provider commit his tasks(only one task is allowed)
-    function commitTask(string ipAddress, uint transactionId) external {
+    function commitTask(string calldata ipAddress, uint transactionId) external {
+        // check the transactionId is available and set the requestId into it
+        require(tidToTransaction[transactionId].creationTimeStamp != 0);
+        tidToTransaction[transactionId].cloudProvider = payable(msg.sender);
+
+
         // using Liveness Probe to check the running status of image
-        string memory url = new string("http://" + ipAddress + ":" + tidToTransaction[transactionId].jobs.port + tidToTransaction[transactionId].jobs.url);
+        string memory url =  string(abi.encodePacked("http://", ipAddress,":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
 
         //TODO check if it's available to get the message
-        Chainlink.Request memory request = buildChainlinkRequest(jobId, address(this), this.fulfillLivenessCheck.selector);
+        Chainlink.Request memory request = buildChainlinkRequest("7401f318127148a894c00c292e486ffd", address(this), this.fulfillLivenessCheck.selector);
 
 
         // Set the URL to perform the GET request on
         request.add("get", url);
-
-        // Set the path to find the desired data in the API response, where the response format is:
-        // {
-        //    "keyword":"<keyword of Liveness probe>"
-        //  }
         request.add("path", "keyword");
 
-        // Multiply the result by 1000000000000000000 to remove decimals
-        int timesAmount = 10 ** 18;
-        request.addInt("times", timesAmount);
-
         // Sends the request
-        return sendChainlinkRequestTo(oracle, request, fee);
-
+        bytes32 requestId = sendChainlinkRequestTo(0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8, request, 3 * 10 ** 18);
+        requestIdToTransactionId[requestId] = transactionId;
+        return;
     }
 
-    function fulfillLivenessCheck(bytes32 _requestId, uint256 _volume) public recordChainlinkFulfillment(_requestId)
+    // receive the response from above commitTask, need to check if it's correct response and change the state of this task
+    function fulfillLivenessCheck(bytes32 _requestId, bytes32 flagMessage) public recordChainlinkFulfillment(_requestId)
     {
-        volume = _volume;
+        uint tid = requestIdToTransactionId[_requestId];
+        Transaction memory transaction = tidToTransaction[tid];
+        if (transaction.jobs.flagMessage == flagMessage) {
+            transaction.state = State.Succeeded;
+            //send money to the cloud provider
+            payable(transaction.cloudProvider).transfer(transaction.money);
+        } else{
+            transaction.state = State.Failed;
+        }
     }
 }
