@@ -2,14 +2,15 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "./log.sol";
 
-contract SimplePaymentChannel is ChainlinkClient {
+contract SimplePaymentChannel is ChainlinkClient, Console {
     //chainlink init
     using Chainlink for Chainlink.Request;
 
 
-    uint count;
-    enum State {Waiting, Failed, Succeeded}
+    uint public count;
+    enum State {Waiting, Failed, Succeeded, Canceled}
 
     // the Information of Job
     struct JobInformation {
@@ -45,14 +46,14 @@ contract SimplePaymentChannel is ChainlinkClient {
     }
 
     //customer to transactions
-    mapping(address => Transaction[]) customerToTransactions;
+    mapping(address => Transaction[]) public customerToTransactions;
     // transactionId to transaction
-    mapping(uint => Transaction) tidToTransaction;
+    mapping(uint => Transaction) public tidToTransaction;
     //requestId to Transaction
-    mapping(bytes32 => uint) requestIdToTransactionId;
+    mapping(bytes32 => uint) public requestIdToTransactionId;
 
     // array below will be used to iterate above mapping
-    address[] consumers;
+    address[] public consumers;
 
 
     constructor ()
@@ -65,7 +66,7 @@ contract SimplePaymentChannel is ChainlinkClient {
     function publishTask(
         string calldata dockerImage,
         string calldata port,
-        bytes32  flagMessage,
+        bytes32 flagMessage,
         string calldata url,
     //TODO change this param(creationTimestamp) into decentralized type
         uint creationTimestamp
@@ -89,67 +90,75 @@ contract SimplePaymentChannel is ChainlinkClient {
 
 
         //add consumer to the address[] consumers
-        if (customerToTransactions[msg.sender].length != 0) {
+        if (customerToTransactions[msg.sender].length == 0) {
             consumers.push(msg.sender);
         }
+        customerToTransactions[msg.sender].push(transaction);
     }
 
-    // retrieve tasksInfo from a target user
-    // to reduce gas, this function need to be called by client as iterator
-    function retrieveTasksInfoFromTargetUser(address consumerAddress, uint index) external view returns (
-        uint transactionId,
+    // retrieve all tasksInfo from a target user
+    function retrieveTasksInfoFromTargetUser(address consumerAddress) external view returns (
+        uint[] memory transactionIds,
     // we need to reflect this value manually in our client
-        State state,
-        string memory dockerImage,
-        string memory port,
-        bytes32 flagMessage,
-        string memory url,
-        uint creationTimeStamp
+        State[] memory states,
+        string[] memory dockerImages,
+        string[] memory ports,
+        bytes32[] memory flagMessages,
+        string[] memory urls,
+        uint[] memory creationTimeStamps
     ){
         //check the length
         require(index < customerToTransactions[consumerAddress].length);
 
-        Transaction memory transaction = customerToTransactions[consumerAddress][index];
+        Transaction[] memory transactions = customerToTransactions[consumerAddress];
 
-        return (transaction.transactionId,
-        transaction.state,
-        transaction.jobs.dockerImage,
-        transaction.jobs.port,
-        transaction.jobs.flagMessage,
-        transaction.jobs.url,
-        transaction.creationTimeStamp);
+        transactionIds = new uint[](transactions.length);
+        states = new State[](transactions.length);
+        dockerImages = new string[](transactions.length);
+        ports = new string[](transactions.length);
+        flagMessages = new bytes32[](transactions.length);
+        urls = new string[](transactions.length);
+        creationTimeStamps = new uint[](transactions.length);
+
+        for (uint i = 0; i < transactions.length; i++) {
+            transactionIds[i] = transactions[i].transactionId;
+            states[i] = transactions[i].state;
+            dockerImages[i] = transactions[i].jobs.dockerImage;
+            ports[i] = transactions[i].jobs.port;
+            flagMessages[i] = transactions[i].jobs.flagMessage;
+            urls[i] = transactions[i].jobs.url;
+            creationTimeStamps[i] = transactions[i].creationTimeStamp;
+        }
+
+
+        return (transactionIds, states, dockerImages, ports, flagMessages, urls, creationTimeStamps);
     }
 
-    //related to above function
-    function getUserTasksLength(address consumerAddress) external view returns (uint index){
-        return customerToTransactions[consumerAddress].length;
-    }
-
-    // retrieve one the unfinished(!= succeeded) state task
+    // retrieve all unfinished(!= succeeded) state tasks
     // cause the returns should not return structure, so I use 2 arrays to return
-    function retrieveOneUnfinishedTask() external view returns (
+    function retrieveAllUnfinishedTask() external view returns (
         string[] memory dockerImages,
         string[] memory ports,
         uint[] memory transactionIds){
         uint total = 0;
         for (uint index = 0; index < consumers.length; index++) {
             for (uint j = 0; j < customerToTransactions[consumers[index]].length; j++) {
-                if (customerToTransactions[consumers[index]][j].state != State.Succeeded) {
+                if (customerToTransactions[consumers[index]][j].state == State.Failed || customerToTransactions[consumers[index]][j].state == State.Waiting) {
                     total++;
                 }
             }
         }
-
         dockerImages = new string[](total);
         ports = new string[](total);
         transactionIds = new uint[](total);
         uint flag = 0;
         for (uint index = 0; index < consumers.length; index++) {
             for (uint j = 0; j < customerToTransactions[consumers[index]].length; j++) {
-                if (customerToTransactions[consumers[index]][j].state != State.Succeeded) {
+                if (customerToTransactions[consumers[index]][j].state == State.Failed || customerToTransactions[consumers[index]][j].state == State.Waiting) {
                     dockerImages[flag] = customerToTransactions[consumers[index]][j].jobs.dockerImage;
                     ports[flag] = customerToTransactions[consumers[index]][j].jobs.port;
                     transactionIds[flag] = customerToTransactions[consumers[index]][j].transactionId;
+                    flag++;
                 }
             }
         }
@@ -160,23 +169,23 @@ contract SimplePaymentChannel is ChainlinkClient {
 
     // customer calls this function and return the money to customer
     function returnMoneyBack(uint transactionId) external payable {
+        // every task will cost about 0.001eth
         // find this transaction
-        Transaction[] memory transactions = customerToTransactions[msg.sender];
-        Transaction memory transaction;
-        uint transactionsLength = transactions.length;
-        uint index = 0;
-        while (index < transactionsLength) {
-            if (transactions[index].transactionId == transactionId) {
-                transaction = transactions[index];
-            }
-            index++;
-        }
+        log("transactionId", transactions);
+        Transaction memory transaction = tidToTransaction[transactionId];
+        // check if the sender and the customer is the same person
+        log("customer", transaction.customer);
+        log("sender", msg.sender);
+        require(transaction.customer = msg.sender);
         // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>24H)
         //TODO change the block.time into real-world time using chainlink
-        require(block.timestamp > transaction.creationTimeStamp + 24 * 60 * 60);
+        log("block.time", block.timestamp);
+        log("creationTimestamp", transaction.creationTimeStamp);
+        require(block.timestamp > transaction.creationTimeStamp + 24);
         // check the status of this task
-        require(transaction.state != State.Succeeded);
+        require(transaction.state == State.Waiting || transaction.state != State.Failed);
 
+        transaction.state = State.Canceled;
         payable(msg.sender).transfer(transaction.money);
     }
 
@@ -188,7 +197,7 @@ contract SimplePaymentChannel is ChainlinkClient {
 
 
         // using Liveness Probe to check the running status of image
-        string memory url =  string(abi.encodePacked("http://", ipAddress,":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
+        string memory url = string(abi.encodePacked("http://", ipAddress, ":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
 
         //TODO check if it's available to get the message
         Chainlink.Request memory request = buildChainlinkRequest("7401f318127148a894c00c292e486ffd", address(this), this.fulfillLivenessCheck.selector);
@@ -213,7 +222,7 @@ contract SimplePaymentChannel is ChainlinkClient {
             transaction.state = State.Succeeded;
             //send money to the cloud provider
             payable(transaction.cloudProvider).transfer(transaction.money);
-        } else{
+        } else {
             transaction.state = State.Failed;
         }
     }
