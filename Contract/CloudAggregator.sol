@@ -8,6 +8,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     //chainlink init
     using Chainlink for Chainlink.Request;
 
+    event taskCommit(string dockerImage, string port,uint transactionId);
 
     uint public count;
     enum State {Waiting, Failed, Succeeded, Canceled}
@@ -40,6 +41,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         // 1->failed
         // 2->waiting
         // 3->succeeded
+        // 4->Canceled
         State state;
         JobInformation jobs;
         uint creationTimeStamp;
@@ -94,6 +96,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
             consumers.push(msg.sender);
         }
         customerToTransactions[msg.sender].push(transaction);
+        emit taskCommit(dockerImage, port, transaction.transactionId);
     }
 
     // retrieve all tasksInfo from a target user
@@ -107,8 +110,6 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         string[] memory urls,
         uint[] memory creationTimeStamps
     ){
-        //check the length
-        require(index < customerToTransactions[consumerAddress].length);
 
         Transaction[] memory transactions = customerToTransactions[consumerAddress];
 
@@ -171,22 +172,16 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     function returnMoneyBack(uint transactionId) external payable {
         // every task will cost about 0.001eth
         // find this transaction
-        log("transactionId", transactions);
         Transaction memory transaction = tidToTransaction[transactionId];
         // check if the sender and the customer is the same person
-        log("customer", transaction.customer);
-        log("sender", msg.sender);
-        require(transaction.customer = msg.sender);
-        // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>24H)
+        // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>1H)
         //TODO change the block.time into real-world time using chainlink
-        log("block.time", block.timestamp);
-        log("creationTimestamp", transaction.creationTimeStamp);
-        require(block.timestamp > transaction.creationTimeStamp + 24);
+        require(block.timestamp > transaction.creationTimeStamp + 1*60*60);
         // check the status of this task
         require(transaction.state == State.Waiting || transaction.state != State.Failed);
 
         transaction.state = State.Canceled;
-        payable(msg.sender).transfer(transaction.money);
+        payable(transaction.customer).transfer(transaction.money);
     }
 
     // cloud provider commit his tasks(only one task is allowed)
