@@ -12,7 +12,7 @@ import (
 )
 
 func CreateOneTransaction(dockerImage string, port string, flagMessage string, url string, creationTimestamp int64) {
-	client, auth := utils.GetClientAndAuth(env.KovanInfura, env.PrivateKey)
+	client, auth := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := store.NewCloudAggregatorTransactor(address, client)

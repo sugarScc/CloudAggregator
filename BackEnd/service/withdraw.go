@@ -10,7 +10,7 @@ import (
 )
 
 func WithdrawDeposit(transactionId int64)  {
-	client, auth := utils.GetClientAndAuth(env.KovanInfura, env.PrivateKey)
+	client, auth := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := store.NewCloudAggregatorTransactor(address, client)

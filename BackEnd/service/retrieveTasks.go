@@ -11,7 +11,7 @@ import (
 )
 
 func RetrieveAllUnfinishedTasks() {
-	client, _ := utils.GetClientAndAuth(env.KovanInfura, env.PrivateKey)
+	client, _ := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := store.NewCloudAggregatorCaller(address, client)
@@ -28,7 +28,7 @@ func RetrieveAllUnfinishedTasks() {
 }
 
 func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks ) {
-	client, _ := utils.GetClientAndAuth(env.KovanInfura, env.PrivateKey)
+	client, _ := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := store.NewCloudAggregatorCaller(address, client)

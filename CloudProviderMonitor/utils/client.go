@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"backend/env"
+	"CloudProviderMonitor/env"
 	"context"
 	"crypto/ecdsa"
 	"fmt"
