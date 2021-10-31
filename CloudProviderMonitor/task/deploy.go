@@ -40,13 +40,12 @@ func commitTask(transactionId int64) {
 		log.Fatal(err)
 	}
 	result, err := exec.Command("curl", "ifconfig.me").Output()
-	fmt.Printf("%v", result)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ip := string(result)
-	log.Println("the ip address is:", ip)
-	transaction, err := instance.CommitTask(auth, "34.150.57.57", big.NewInt(transactionId))
+	log.Println("the ip address is:", ip, "the transactionId is :", transactionId)
+	transaction, err := instance.CommitTask(auth, ip, big.NewInt(transactionId))
 	if err != nil {
 		log.Fatal(err)
 	}
