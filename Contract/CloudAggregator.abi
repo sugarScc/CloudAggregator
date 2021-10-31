@@ -1,5 +1,10 @@
 [
 	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -217,75 +222,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "bytes32",
-				"name": "_requestId",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "flagMessage",
-				"type": "bytes32"
-			}
-		],
-		"name": "fulfillLivenessCheck",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "dockerImage",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "port",
-				"type": "string"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "flagMessage",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "string",
-				"name": "url",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "creationTimestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "publishTask",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "transactionId",
-				"type": "uint256"
-			}
-		],
-		"name": "returnMoneyBack",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
@@ -374,6 +310,11 @@
 					},
 					{
 						"internalType": "string",
+						"name": "path",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
 						"name": "url",
 						"type": "string"
 					},
@@ -407,6 +348,57 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_requestId",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "flagMessage",
+				"type": "bytes32"
+			}
+		],
+		"name": "fulfillLivenessCheck",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "dockerImage",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "port",
+				"type": "string"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "flagMessage",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "string",
+				"name": "url",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "creationTimestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "publishTask",
+		"outputs": [],
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -480,7 +472,7 @@
 				"type": "uint256[]"
 			},
 			{
-				"internalType": "uint8[]",
+				"internalType": "enum SimplePaymentChannel.State[]",
 				"name": "states",
 				"type": "uint8[]"
 			},
@@ -501,6 +493,11 @@
 			},
 			{
 				"internalType": "string[]",
+				"name": "path",
+				"type": "string[]"
+			},
+			{
+				"internalType": "string[]",
 				"name": "urls",
 				"type": "string[]"
 			},
@@ -511,6 +508,19 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "transactionId",
+				"type": "uint256"
+			}
+		],
+		"name": "returnMoneyBack",
+		"outputs": [],
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -564,6 +574,11 @@
 						"internalType": "bytes32",
 						"name": "flagMessage",
 						"type": "bytes32"
+					},
+					{
+						"internalType": "string",
+						"name": "path",
+						"type": "string"
 					},
 					{
 						"internalType": "string",
