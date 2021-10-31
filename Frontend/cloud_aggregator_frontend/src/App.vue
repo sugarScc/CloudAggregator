@@ -21,11 +21,13 @@
 import HomeHeader from './components/Header'
 import LeftMenu from './components/LeftMenu'
 import Login from './components/Login'
+import Global from './Global'
 
 export default {
   name: 'App',
   data: function () {
     return {
+      Global: Global,
       EnableLogin: false
     }
   },

@@ -6,10 +6,13 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import '@/assets/css/global.css'
+import Global from './Global'
+
 
 Vue.use(ElementUI)
 Vue.use(Container)
 
+Vue.prototype.Global = Global
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

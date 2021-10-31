@@ -4,6 +4,7 @@ import (
 	store "backend/contract"
 	"backend/env"
 	"backend/utils"
+	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stratumn/go-core/types"
@@ -11,7 +12,7 @@ import (
 	"math/big"
 )
 
-func CreateOneTransaction(dockerImage string, port string, flagMessage string, url string, creationTimestamp int64) {
+func CreateOneTransaction(userAddress string, dockerImage string, port string, flagMessage string, url string, creationTimestamp int64) {
 	client, auth := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
@@ -19,15 +20,26 @@ func CreateOneTransaction(dockerImage string, port string, flagMessage string, u
 	if err != nil {
 		log.Fatal(err)
 	}
-	// transfer the params into using structure
-	flagMessageBytes32, err := types.NewBytes32FromString(flagMessage)
+	bytes32, err := hex.DecodeString(fmt.Sprintf("%x", flagMessage))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	val := types.NewBytes32FromBytes(bytes32)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
+	userAddressBytes := common.HexToAddress(userAddress)
+	//TODO Check if available
+	auth.From = userAddressBytes
+	// transfer this 0.1 ETH as the Task Fee
+	auth.Value = big.NewInt(100000000000000000)
 
-	result, err := instance.PublishTask(auth, dockerImage, port, *flagMessageBytes32, url, big.NewInt(creationTimestamp))
+	result, err := instance.PublishTask(auth, dockerImage, port, *val, url, big.NewInt(creationTimestamp))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("CreateOneTransaction finished, transaction hash: %h",result.Hash())
+	fmt.Printf("CreateOneTransaction finished, transaction hash: %h", result.Hash())
 }

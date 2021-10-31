@@ -6,7 +6,7 @@
     :before-close="handleClose">
     <el-form ref="form" :model="form" size="small" label-width="100px">
       <el-row>
-        <el-form-item label="账户地址">
+        <el-form-item label="Address">
           <el-input class="search-input" placeholder="请输入钱包地址" v-model="form.id"/>
         </el-form-item>
       </el-row>
@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import {eventBus} from '../eventBus'
 
 export default {
   name: 'Login',
@@ -40,11 +39,6 @@ export default {
         .catch(_ => {
         })
     }
-  },
-  mounted () {
-    eventBus.$on('login', () => {
-      this.EnableLogin = true
-    })
   }
 }
 </script>

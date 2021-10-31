@@ -1,10 +1,12 @@
 package dto
 
 type CommitRequest struct {
-	DockerImage       string `json:"docker_image"`
-	Port              string `json:"port"`
-	FlagMessage       string `json:"flag_message"`
-	Url               string `json:"url"`
+	UserAddress string `json:"user_address"`
+
+	DockerImage string `json:"docker_image"`
+	Port        string `json:"port"`
+	FlagMessage string `json:"flag_message"`
+	Url         string `json:"url"`
 }
 
 type WithdrawRequest struct {

@@ -5,8 +5,8 @@
         <template slot="title"><i class="el-icon-message"></i>导航一</template>
         <el-menu-item-group>
           <!--设置index-->
-          <el-menu-item index="/taskForm">创建任务</el-menu-item>
-          <el-menu-item index="/tasksInfo">任务列表</el-menu-item>
+          <el-menu-item index="/taskForm">Create</el-menu-item>
+          <el-menu-item index="/tasksInfo">TasksInfo</el-menu-item>
         </el-menu-item-group>
       </el-submeu>
     </el-menu>

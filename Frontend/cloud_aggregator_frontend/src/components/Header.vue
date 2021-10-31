@@ -1,20 +1,26 @@
 <template>
   <el-header style="text-align: right; font-size: 12px">
-    <el-button type="primary" @click="Login()">登录</el-button>
+    <el-button v-if=" this.Global.AccountAddress=== undefined || this.Global.AccountAddress=== null" type="primary" @click="Login()">login</el-button>
+    <el-button v-else type="primary" disabled>{{this.Global.AccountAddress}}</el-button>
   </el-header>
 </template>
 
 <script>
-import {eventBus} from '../eventBus'
+import Vue from 'vue'
 
 export default {
   name: 'Header',
+  data: function () {
+  },
   methods: {
-    Login: function () {
-      console.log('true')
-      eventBus.$emit('login')
+    Login: async function () {
+      await this.getAccount()
+    },
+    async getAccount () {
+      const accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
+      const account = accounts[0]
+      this.Global.AccountAddress = account
     }
-
   }
 }
 </script>

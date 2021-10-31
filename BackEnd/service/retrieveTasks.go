@@ -5,9 +5,11 @@ import (
 	"backend/env"
 	"backend/utils"
 	"backend/vo"
+	"bytes"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"log"
+	"time"
 )
 
 func RetrieveAllUnfinishedTasks() {
@@ -27,7 +29,7 @@ func RetrieveAllUnfinishedTasks() {
 	fmt.Printf("%+vo", results)
 }
 
-func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks ) {
+func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks) {
 	client, _ := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
@@ -49,9 +51,15 @@ func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks ) {
 		task.State = Reflect[results.States[index]]
 		task.DockerImage = results.DockerImages[index]
 		task.Port = results.Ports[index]
-		task.FlagMessage = common.Bytes2Hex(results.FlagMessages[index][:])
+		bytesTmp := bytes.Trim(results.FlagMessages[index][:], "\x00")
+		task.FlagMessage = string(bytesTmp)
 		task.Url = results.Urls[index]
 		task.CreationTimeStamps = results.CreationTimeStamps[index].Int64()
+		if time.Now().Unix() > task.CreationTimeStamps+1*60*60 {
+			task.WithDrawVisible = true
+		} else {
+			task.WithDrawVisible = false
+		}
 		tasks = append(tasks, task)
 	}
 

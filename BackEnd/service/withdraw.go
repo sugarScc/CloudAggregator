@@ -9,7 +9,7 @@ import (
 	"math/big"
 )
 
-func WithdrawDeposit(transactionId int64)  {
+func WithdrawDeposit(transactionId int64, userAddress string)  {
 	client, auth := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
@@ -17,6 +17,9 @@ func WithdrawDeposit(transactionId int64)  {
 	if err != nil {
 		log.Fatal(err)
 	}
+	userAddressBytes := common.HexToAddress(userAddress)
+	//TODO Check if available
+	auth.From = userAddressBytes
 	result,err := instance.ReturnMoneyBack(auth, big.NewInt(transactionId))
 	if err != nil{
 		log.Fatal(err)

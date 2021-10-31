@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -22,7 +23,7 @@ func PostOneTransaction(ctx *gin.Context)  {
 	if err != nil{
 		log.Fatal(err)
 	}
-	service.CreateOneTransaction(commitRequest.DockerImage, commitRequest.Port, commitRequest.FlagMessage, commitRequest.Url, time.Now().Unix())
+	service.CreateOneTransaction(commitRequest.UserAddress, commitRequest.DockerImage, commitRequest.Port, commitRequest.FlagMessage, commitRequest.Url, time.Now().Unix())
 	ctx.JSON(204, vo.Response{
 		Code: 204,
 	})
@@ -42,16 +43,8 @@ func RetrieveTasksFromUser(ctx *gin.Context) {
 }
 
 func WithdrawDeposit(ctx *gin.Context)  {
-	var withdrawRequest dto.WithdrawRequest
-	bodyBytes, err := ioutil.ReadAll(ctx.Request.Body)
-	if err != nil{
-		log.Fatal(err)
-	}
-	err = json.Unmarshal(bodyBytes, &withdrawRequest)
-	if err != nil{
-		log.Fatal(err)
-	}
-	service.WithdrawDeposit(withdrawRequest.TransactionId)
+	transactionId,_ := strconv.Atoi(ctx.Param("transactionId"))
+	service.WithdrawDeposit(int64(transactionId), ctx.Param("userAddress"))
 	ctx.JSON(204, vo.Response{
 		Code: 204,
 	})
