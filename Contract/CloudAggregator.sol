@@ -8,7 +8,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     //chainlink init
     using Chainlink for Chainlink.Request;
 
-    event taskCommit(string dockerImage, string port,uint transactionId);
+    event taskCommit(string dockerImage, string port, uint transactionId);
 
     bytes32 public finished;
     uint public count;
@@ -23,6 +23,8 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         string port;
         // the chainlink will always return bytes32, so we just store the bytes32 one
         bytes32 flagMessage;
+        string path;
+
         string url;
 
         //IP address of the docker instance
@@ -82,7 +84,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         transaction.jobs.dockerImage = dockerImage;
         transaction.jobs.flagMessage = flagMessage;
         transaction.jobs.port = port;
-        transaction.jobs.url = url;
+        transaction.jobs.path = url;
 
         //creation timestamp
         transaction.creationTimeStamp = creationTimestamp;
@@ -109,6 +111,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         string[] memory dockerImages,
         string[] memory ports,
         bytes32[] memory flagMessages,
+        string[] memory path,
         string[] memory urls,
         uint[] memory creationTimeStamps
     ){
@@ -120,24 +123,26 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         dockerImages = new string[](transactions.length);
         ports = new string[](transactions.length);
         flagMessages = new bytes32[](transactions.length);
-        urls = new string[](transactions.length);
+        path = new string[](transactions.length);
         creationTimeStamps = new uint[](transactions.length);
+        urls = new string[](transactions.length);
 
         for (uint i = 0; i < transactions.length; i++) {
             transactionIds[i] = transactions[i].transactionId;
             states[i] = transactions[i].state;
+            urls[i] = transactions[i].jobs.url;
             dockerImages[i] = transactions[i].jobs.dockerImage;
             ports[i] = transactions[i].jobs.port;
             flagMessages[i] = transactions[i].jobs.flagMessage;
-            urls[i] = transactions[i].jobs.url;
+            path[i] = transactions[i].jobs.path;
             creationTimeStamps[i] = transactions[i].creationTimeStamp;
         }
 
 
-        return (transactionIds, states, dockerImages, ports, flagMessages, urls, creationTimeStamps);
+        return (transactionIds, states, dockerImages, ports, flagMessages, path, urls, creationTimeStamps);
     }
 
-    // retrieve all unfinished(!= succeeded) state tasks
+    // retrieve all unfinished(!= succeeded) state taskss
     // cause the returns should not return structure, so I use 2 arrays to return
     function retrieveAllUnfinishedTask() external view returns (
         string[] memory dockerImages,
@@ -173,16 +178,27 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     // customer calls this function and return the money to customer
     function returnMoneyBack(uint transactionId) external payable {
         // every task will cost about 0.01eth
-        // find this transaction
+        // find this transaction in tidToTransaction Map
         Transaction storage transaction = tidToTransaction[transactionId];
         // check if the sender and the customer is the same person
         // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>1H)
         //TODO change the block.time into real-world time using chainlink
-        require(block.timestamp > transaction.creationTimeStamp + 1*60*60);
+        require(block.timestamp > transaction.creationTimeStamp + 1 * 60 * 60);
         // check the status of this task
         require(transaction.state == State.Waiting || transaction.state == State.Failed);
 
         transaction.state = State.Canceled;
+        // find this transaction in customerToTransactions
+        Transaction[] memory transactions = customerToTransactions[transaction.customer];
+        uint index = 0;
+        for (; index < transactions.length; index++) {
+            if (transactions[index].transactionId == transactionId) {
+                break;
+            }
+        }
+        Transaction storage transactionInMap2 = customerToTransactions[transaction.customer][index];
+        transactionInMap2.state = State.Canceled;
+
         payable(transaction.customer).transfer(transaction.money);
     }
 
@@ -192,9 +208,22 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         require(tidToTransaction[transactionId].creationTimeStamp != 0);
         tidToTransaction[transactionId].cloudProvider = payable(msg.sender);
 
+        // find this transaction in customerToTransactions
+        Transaction[] memory transactions = customerToTransactions[tidToTransaction[transactionId].customer];
+        uint index = 0;
+        for (; index < transactions.length; index++) {
+            if (transactions[index].transactionId == transactionId) {
+                break;
+            }
+        }
+        Transaction storage transactionInMap2 = customerToTransactions[tidToTransaction[transactionId].customer][index];
+        transactionInMap2.cloudProvider = payable(msg.sender);
+
 
         // using Liveness Probe to check the running status of image
-        string memory url =string(abi.encodePacked("http://", ipAddress, ":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
+        string memory url = string(abi.encodePacked("http://", ipAddress, ":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.path));
+        transactionInMap2.jobs.url = url;
+        tidToTransaction[transactionId].jobs.url = url;
 
         //TODO check if it's available to get the message
         Chainlink.Request memory request = buildChainlinkRequest("7401f318127148a894c00c292e486ffd", address(this), this.fulfillLivenessCheck.selector);
@@ -205,7 +234,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         request.add("path", "keyword");
 
         // Sends the request
-        bytes32 requestId = sendChainlinkRequestTo(0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8, request, 3 * 10 ** 18);
+        bytes32 requestId = sendChainlinkRequestTo(0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8, request, 10 * 10 ** 18);
         requestIdToTransactionId[requestId] = transactionId;
         return;
     }
@@ -216,12 +245,27 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         finished = flagMessage;
         uint tid = requestIdToTransactionId[_requestId];
         Transaction storage transaction = tidToTransaction[tid];
+        // find this transaction in customerToTransactions
+        Transaction[] memory transactions = customerToTransactions[transaction.customer];
+        uint index = 0;
+        for (; index < transactions.length; index++) {
+            if (transactions[index].transactionId == transaction.transactionId) {
+                break;
+            }
+        }
+        Transaction storage transactionInMap2 = customerToTransactions[transaction.customer][index];
+
         if (transaction.jobs.flagMessage == flagMessage) {
             transaction.state = State.Succeeded;
+            transactionInMap2.state = State.Succeeded;
             //send money to the cloud provider
             payable(transaction.cloudProvider).transfer(transaction.money);
         } else {
             transaction.state = State.Failed;
+            transaction.jobs.url = "";
+            transactionInMap2.state = State.Failed;
+            transactionInMap2.jobs.url = "";
+
         }
     }
 }

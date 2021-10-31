@@ -55,7 +55,7 @@ func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks) {
 		task.FlagMessage = string(bytesTmp)
 		task.Url = results.Urls[index]
 		task.CreationTimeStamps = results.CreationTimeStamps[index].Int64()
-		if time.Now().Unix() > task.CreationTimeStamps+1*60*60 {
+		if time.Now().Unix() > task.CreationTimeStamps+1*60*60 && (task.State == "Waiting" || task.State == "Failed") {
 			task.WithDrawVisible = true
 		} else {
 			task.WithDrawVisible = false

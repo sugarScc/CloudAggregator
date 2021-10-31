@@ -13,7 +13,7 @@
     </el-table-column>
     <el-table-column prop="creation_time_stamps" label="CreationTime" width="120">
     </el-table-column>
-    <el-table-column prop="docker_image" label="DockerImage" width="120">
+    <el-table-column prop="docker_image" label="DockerImage" width="200">
     </el-table-column>
     <el-table-column prop="flag_message" label="LivenessMsg" width="120">
     </el-table-column>
