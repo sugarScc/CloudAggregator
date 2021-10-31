@@ -12,14 +12,14 @@ import (
 	"math/big"
 )
 
-func GetClientAndAuth() (*ethclient.Client,*bind.TransactOpts) {
+func GetClientAndAuth() (*ethclient.Client, *bind.TransactOpts) {
 	client, err := ethclient.Dial(env.KovanInfura)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("we have a connection")
 
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	privateKey, err := crypto.HexToECDSA(env.PrivateKey)
@@ -47,8 +47,8 @@ func GetClientAndAuth() (*ethclient.Client,*bind.TransactOpts) {
 
 	auth := bind.NewKeyedTransactor(privateKey)
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)     // in wei
-	auth.GasLimit = uint64(300000) // in units
+	auth.Value = big.NewInt(0)      // in wei
+	auth.GasLimit = uint64(3000000) // in units
 	auth.GasPrice = gasPrice
 
 	return client, auth

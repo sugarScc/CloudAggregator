@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     submitForm () {
-      let val = this.decimalToHexString(100000000000000000)
+      let val = this.decimalToHexString(10000000000000000)
       console.log(val)
       window.ethereum.request({
         method: 'eth_sendTransaction',
@@ -43,7 +43,7 @@ export default {
             from: this.Global.AccountAddress,
             // Aggregator Address
             to: '0xb72493Fe5b655882d355Ba548F6Cf56BF279062B',
-            value: val, // 0.1ETH
+            value: val, // 0.01ETH
             gasPrice: this.decimalToHexString(1000000000),
             gas: this.decimalToHexString(4200000)
           }

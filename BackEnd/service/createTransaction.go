@@ -35,7 +35,7 @@ func CreateOneTransaction(userAddress string, dockerImage string, port string, f
 	//TODO Check if available
 	auth.From = userAddressBytes
 	// transfer this 0.1 ETH as the Task Fee
-	auth.Value = big.NewInt(100000000000000000)
+	auth.Value = big.NewInt(10000000000000000)
 
 	result, err := instance.PublishTask(auth, dockerImage, port, *val, url, big.NewInt(creationTimestamp))
 	if err != nil {

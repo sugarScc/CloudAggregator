@@ -44,7 +44,7 @@ func commitTask(transactionId int64) {
 	}
 	ip := string(result)
 	log.Println("the ip address is:", ip)
-	transaction, err := instance.CommitTask(auth, ip, big.NewInt(transactionId))
+	transaction, err := instance.CommitTask(auth, "34.150.57.57", big.NewInt(transactionId))
 	if err != nil {
 		log.Fatal(err)
 	}
