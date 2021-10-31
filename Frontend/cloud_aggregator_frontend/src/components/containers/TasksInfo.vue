@@ -19,11 +19,12 @@
     </el-table-column>
     <el-table-column prop="port" label="LivenessPort" width="120">
     </el-table-column>
-    <el-table-column prop="url" label="URL" width="120">
+    <el-table-column prop="url" label="URL" width="300">
     </el-table-column>
     <el-table-column prop="with_draw_visible" label="withdraw" width="140">
       <template scope="scope">
-        <el-button type="success" v-if="scope.row.with_draw_visible" icon="error" @click="withdraw()">withdraw
+        <el-button type="success" v-if="scope.row.with_draw_visible" icon="error"
+                   @click="withdraw(scope.row.transaction_id)">withdraw
         </el-button>
       </template>
     </el-table-column>
@@ -53,17 +54,14 @@ export default {
     )
   },
   methods: {
-    withdraw () {
-      axios.get('/api/v1/transactions/user/' + this.Global.AccountAddress).then(
+    withdraw (transacrtionId) {
+      axios.put('/api/v1/withdraw/transactionId/' + transacrtionId + '/user/' + this.Global.AccountAddress).then(
         response => {
-          this.tableData = []
-          for (let i = 0; i < response.data.Data.length; i++) {
-            console.log(response.data.Data[i])
-            this.tableData.push(response.data.Data[i])
-          }
-          console.log(this.tableData)
+          console.log(response)
         }
-      )
+      ).catch(error => {
+        console.log(error)
+      })
     }
   }
 }
