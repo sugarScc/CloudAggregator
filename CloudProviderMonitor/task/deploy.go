@@ -18,7 +18,7 @@ func Deploy(taskChan chan dto.Task) {
 		select {
 		case task := <-taskChan:
 			log.Printf("retrieve task:%v\n", task)
-			cmd := exec.Command("docker", "run", "-p", fmt.Sprintf("%s:%s", task.Port, task.Port), task.DockerImage)
+			cmd := exec.Command("docker", "run", "-d", "-p", fmt.Sprintf("%s:%s", task.Port, task.Port), task.DockerImage)
 			fmt.Printf("cmd command is : %s\n", cmd.String())
 			err := cmd.Run()
 			if err != nil {
