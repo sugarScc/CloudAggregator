@@ -44,6 +44,7 @@ func commitTask(transactionId int64) {
 		log.Fatal(err)
 	}
 	ip := string(result)
+	auth.GasLimit = 2999999
 	log.Println("the ip address is:", ip, "the transactionId is :", transactionId)
 	transaction, err := instance.CommitTask(auth, ip, big.NewInt(transactionId))
 	if err != nil {
