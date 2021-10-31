@@ -39,7 +39,7 @@ type SimplePaymentChannelJobInformation struct {
 
 // CloudAggregatorMetaData contains all meta data concerning the CloudAggregator contract.
 var CloudAggregatorMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkCancelled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkFulfilled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"LogAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"LogBytes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogBytes32\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"LogUint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"taskCommit\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"commitTask\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"consumers\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"customerToTransactions\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"},{\"internalType\":\"addresspayable\",\"name\":\"customer\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"cloudProvider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"money\",\"type\":\"uint256\"},{\"internalType\":\"enumSimplePaymentChannel.State\",\"name\":\"state\",\"type\":\"uint8\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"}],\"internalType\":\"structSimplePaymentChannel.JobInformation\",\"name\":\"jobs\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"creationTimeStamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_requestId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"}],\"name\":\"fulfillLivenessCheck\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"creationTimestamp\",\"type\":\"uint256\"}],\"name\":\"publishTask\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"requestIdToTransactionId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllUnfinishedTask\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"dockerImages\",\"type\":\"string[]\"},{\"internalType\":\"string[]\",\"name\":\"ports\",\"type\":\"string[]\"},{\"internalType\":\"uint256[]\",\"name\":\"transactionIds\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"consumerAddress\",\"type\":\"address\"}],\"name\":\"retrieveTasksInfoFromTargetUser\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"transactionIds\",\"type\":\"uint256[]\"},{\"internalType\":\"enumSimplePaymentChannel.State[]\",\"name\":\"states\",\"type\":\"uint8[]\"},{\"internalType\":\"string[]\",\"name\":\"dockerImages\",\"type\":\"string[]\"},{\"internalType\":\"string[]\",\"name\":\"ports\",\"type\":\"string[]\"},{\"internalType\":\"bytes32[]\",\"name\":\"flagMessages\",\"type\":\"bytes32[]\"},{\"internalType\":\"string[]\",\"name\":\"urls\",\"type\":\"string[]\"},{\"internalType\":\"uint256[]\",\"name\":\"creationTimeStamps\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"returnMoneyBack\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"tidToTransaction\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"},{\"internalType\":\"addresspayable\",\"name\":\"customer\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"cloudProvider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"money\",\"type\":\"uint256\"},{\"internalType\":\"enumSimplePaymentChannel.State\",\"name\":\"state\",\"type\":\"uint8\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"}],\"internalType\":\"structSimplePaymentChannel.JobInformation\",\"name\":\"jobs\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"creationTimeStamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkCancelled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkFulfilled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"id\",\"type\":\"bytes32\"}],\"name\":\"ChainlinkRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"LogAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"LogBytes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogBytes32\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"LogString\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"LogUint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"taskCommit\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"commitTask\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"consumers\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"customerToTransactions\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"},{\"internalType\":\"addresspayable\",\"name\":\"customer\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"cloudProvider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"money\",\"type\":\"uint256\"},{\"internalType\":\"enumSimplePaymentChannel.State\",\"name\":\"state\",\"type\":\"uint8\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"}],\"internalType\":\"structSimplePaymentChannel.JobInformation\",\"name\":\"jobs\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"creationTimeStamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"finished\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_requestId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"}],\"name\":\"fulfillLivenessCheck\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"creationTimestamp\",\"type\":\"uint256\"}],\"name\":\"publishTask\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"requestIdToTransactionId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"result\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllUnfinishedTask\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"dockerImages\",\"type\":\"string[]\"},{\"internalType\":\"string[]\",\"name\":\"ports\",\"type\":\"string[]\"},{\"internalType\":\"uint256[]\",\"name\":\"transactionIds\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"consumerAddress\",\"type\":\"address\"}],\"name\":\"retrieveTasksInfoFromTargetUser\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"transactionIds\",\"type\":\"uint256[]\"},{\"internalType\":\"enumSimplePaymentChannel.State[]\",\"name\":\"states\",\"type\":\"uint8[]\"},{\"internalType\":\"string[]\",\"name\":\"dockerImages\",\"type\":\"string[]\"},{\"internalType\":\"string[]\",\"name\":\"ports\",\"type\":\"string[]\"},{\"internalType\":\"bytes32[]\",\"name\":\"flagMessages\",\"type\":\"bytes32[]\"},{\"internalType\":\"string[]\",\"name\":\"urls\",\"type\":\"string[]\"},{\"internalType\":\"uint256[]\",\"name\":\"creationTimeStamps\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"}],\"name\":\"returnMoneyBack\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"tidToTransaction\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"transactionId\",\"type\":\"uint256\"},{\"internalType\":\"addresspayable\",\"name\":\"customer\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"cloudProvider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"money\",\"type\":\"uint256\"},{\"internalType\":\"enumSimplePaymentChannel.State\",\"name\":\"state\",\"type\":\"uint8\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"dockerImage\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"port\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"flagMessage\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipAddress\",\"type\":\"string\"}],\"internalType\":\"structSimplePaymentChannel.JobInformation\",\"name\":\"jobs\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"creationTimeStamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // CloudAggregatorABI is the input ABI used to generate the binding from.
@@ -320,6 +320,37 @@ func (_CloudAggregator *CloudAggregatorCallerSession) CustomerToTransactions(arg
 	return _CloudAggregator.Contract.CustomerToTransactions(&_CloudAggregator.CallOpts, arg0, arg1)
 }
 
+// Finished is a free data retrieval call binding the contract method 0xbef4876b.
+//
+// Solidity: function finished() view returns(bytes32)
+func (_CloudAggregator *CloudAggregatorCaller) Finished(opts *bind.CallOpts) ([32]byte, error) {
+	var out []interface{}
+	err := _CloudAggregator.contract.Call(opts, &out, "finished")
+
+	if err != nil {
+		return *new([32]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+
+	return out0, err
+
+}
+
+// Finished is a free data retrieval call binding the contract method 0xbef4876b.
+//
+// Solidity: function finished() view returns(bytes32)
+func (_CloudAggregator *CloudAggregatorSession) Finished() ([32]byte, error) {
+	return _CloudAggregator.Contract.Finished(&_CloudAggregator.CallOpts)
+}
+
+// Finished is a free data retrieval call binding the contract method 0xbef4876b.
+//
+// Solidity: function finished() view returns(bytes32)
+func (_CloudAggregator *CloudAggregatorCallerSession) Finished() ([32]byte, error) {
+	return _CloudAggregator.Contract.Finished(&_CloudAggregator.CallOpts)
+}
+
 // RequestIdToTransactionId is a free data retrieval call binding the contract method 0x76992720.
 //
 // Solidity: function requestIdToTransactionId(bytes32 ) view returns(uint256)
@@ -349,6 +380,37 @@ func (_CloudAggregator *CloudAggregatorSession) RequestIdToTransactionId(arg0 [3
 // Solidity: function requestIdToTransactionId(bytes32 ) view returns(uint256)
 func (_CloudAggregator *CloudAggregatorCallerSession) RequestIdToTransactionId(arg0 [32]byte) (*big.Int, error) {
 	return _CloudAggregator.Contract.RequestIdToTransactionId(&_CloudAggregator.CallOpts, arg0)
+}
+
+// Result is a free data retrieval call binding the contract method 0x65372147.
+//
+// Solidity: function result() view returns(string)
+func (_CloudAggregator *CloudAggregatorCaller) Result(opts *bind.CallOpts) (string, error) {
+	var out []interface{}
+	err := _CloudAggregator.contract.Call(opts, &out, "result")
+
+	if err != nil {
+		return *new(string), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+
+	return out0, err
+
+}
+
+// Result is a free data retrieval call binding the contract method 0x65372147.
+//
+// Solidity: function result() view returns(string)
+func (_CloudAggregator *CloudAggregatorSession) Result() (string, error) {
+	return _CloudAggregator.Contract.Result(&_CloudAggregator.CallOpts)
+}
+
+// Result is a free data retrieval call binding the contract method 0x65372147.
+//
+// Solidity: function result() view returns(string)
+func (_CloudAggregator *CloudAggregatorCallerSession) Result() (string, error) {
+	return _CloudAggregator.Contract.Result(&_CloudAggregator.CallOpts)
 }
 
 // RetrieveAllUnfinishedTask is a free data retrieval call binding the contract method 0x9993179a.
@@ -1726,6 +1788,141 @@ func (_CloudAggregator *CloudAggregatorFilterer) WatchLogInt(opts *bind.WatchOpt
 func (_CloudAggregator *CloudAggregatorFilterer) ParseLogInt(log types.Log) (*CloudAggregatorLogInt, error) {
 	event := new(CloudAggregatorLogInt)
 	if err := _CloudAggregator.contract.UnpackLog(event, "LogInt", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// CloudAggregatorLogStringIterator is returned from FilterLogString and is used to iterate over the raw logs and unpacked data for LogString events raised by the CloudAggregator contract.
+type CloudAggregatorLogStringIterator struct {
+	Event *CloudAggregatorLogString // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *CloudAggregatorLogStringIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(CloudAggregatorLogString)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(CloudAggregatorLogString)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *CloudAggregatorLogStringIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *CloudAggregatorLogStringIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// CloudAggregatorLogString represents a LogString event raised by the CloudAggregator contract.
+type CloudAggregatorLogString struct {
+	Arg0 string
+	Arg1 string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterLogString is a free log retrieval operation binding the contract event 0x27a8767ed172b48d7cf6dbb25d2840c5fa91ef78fa6e05c13c82763d099f03ca.
+//
+// Solidity: event LogString(string arg0, string arg1)
+func (_CloudAggregator *CloudAggregatorFilterer) FilterLogString(opts *bind.FilterOpts) (*CloudAggregatorLogStringIterator, error) {
+
+	logs, sub, err := _CloudAggregator.contract.FilterLogs(opts, "LogString")
+	if err != nil {
+		return nil, err
+	}
+	return &CloudAggregatorLogStringIterator{contract: _CloudAggregator.contract, event: "LogString", logs: logs, sub: sub}, nil
+}
+
+// WatchLogString is a free log subscription operation binding the contract event 0x27a8767ed172b48d7cf6dbb25d2840c5fa91ef78fa6e05c13c82763d099f03ca.
+//
+// Solidity: event LogString(string arg0, string arg1)
+func (_CloudAggregator *CloudAggregatorFilterer) WatchLogString(opts *bind.WatchOpts, sink chan<- *CloudAggregatorLogString) (event.Subscription, error) {
+
+	logs, sub, err := _CloudAggregator.contract.WatchLogs(opts, "LogString")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(CloudAggregatorLogString)
+				if err := _CloudAggregator.contract.UnpackLog(event, "LogString", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseLogString is a log parse operation binding the contract event 0x27a8767ed172b48d7cf6dbb25d2840c5fa91ef78fa6e05c13c82763d099f03ca.
+//
+// Solidity: event LogString(string arg0, string arg1)
+func (_CloudAggregator *CloudAggregatorFilterer) ParseLogString(log types.Log) (*CloudAggregatorLogString, error) {
+	event := new(CloudAggregatorLogString)
+	if err := _CloudAggregator.contract.UnpackLog(event, "LogString", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
