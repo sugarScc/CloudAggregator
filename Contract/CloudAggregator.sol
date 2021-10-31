@@ -10,7 +10,9 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
 
     event taskCommit(string dockerImage, string port,uint transactionId);
 
+    bytes32 public finished;
     uint public count;
+    string public result;
     enum State {Waiting, Failed, Succeeded, Canceled}
 
     // the Information of Job
@@ -170,15 +172,15 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
 
     // customer calls this function and return the money to customer
     function returnMoneyBack(uint transactionId) external payable {
-        // every task will cost about 0.001eth
+        // every task will cost about 0.01eth
         // find this transaction
-        Transaction memory transaction = tidToTransaction[transactionId];
+        Transaction storage transaction = tidToTransaction[transactionId];
         // check if the sender and the customer is the same person
         // check the time, the customer only allowed to withdraw his/her deposit when the time is out(>1H)
         //TODO change the block.time into real-world time using chainlink
         require(block.timestamp > transaction.creationTimeStamp + 1*60*60);
         // check the status of this task
-        require(transaction.state == State.Waiting || transaction.state != State.Failed);
+        require(transaction.state == State.Waiting || transaction.state == State.Failed);
 
         transaction.state = State.Canceled;
         payable(transaction.customer).transfer(transaction.money);
@@ -192,7 +194,7 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
 
 
         // using Liveness Probe to check the running status of image
-        string memory url = string(abi.encodePacked("http://", ipAddress, ":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
+        string memory url =string(abi.encodePacked("http://", ipAddress, ":", tidToTransaction[transactionId].jobs.port, tidToTransaction[transactionId].jobs.url));
 
         //TODO check if it's available to get the message
         Chainlink.Request memory request = buildChainlinkRequest("7401f318127148a894c00c292e486ffd", address(this), this.fulfillLivenessCheck.selector);
@@ -211,8 +213,9 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     // receive the response from above commitTask, need to check if it's correct response and change the state of this task
     function fulfillLivenessCheck(bytes32 _requestId, bytes32 flagMessage) public recordChainlinkFulfillment(_requestId)
     {
+        finished = flagMessage;
         uint tid = requestIdToTransactionId[_requestId];
-        Transaction memory transaction = tidToTransaction[tid];
+        Transaction storage transaction = tidToTransaction[tid];
         if (transaction.jobs.flagMessage == flagMessage) {
             transaction.state = State.Succeeded;
             //send money to the cloud provider
