@@ -16,6 +16,7 @@ import (
 )
 
 func SubscriptEvent(channel chan dto.Task) {
+	log.Println("start Subscript")
 	client, err := ethclient.Dial(env.KovanInfura)
 	if err != nil {
 		log.Fatal(err)
