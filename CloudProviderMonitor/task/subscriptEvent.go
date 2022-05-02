@@ -19,7 +19,8 @@ func SubscriptEvent(channel chan dto.Task) {
 	log.Println("start Subscript")
 	client, err := ethclient.Dial(env.KovanInfura)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
+		return
 	}
 
 	contractAddress := common.HexToAddress(env.ContractAddress)
@@ -30,18 +31,21 @@ func SubscriptEvent(channel chan dto.Task) {
 	logs := make(chan types.Log)
 	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
+		return
 	}
 	contractAbi, err := abi.JSON(strings.NewReader(CloudAggregator.CloudAggregatorABI))
 
 	for {
 		select {
 		case err := <-sub.Err():
-			log.Fatal(err)
+			log.Println(err.Error())
+			continue
 		case vLog := <-logs:
 			result, err := contractAbi.Unpack("taskCommit", vLog.Data)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err.Error())
+				continue
 			}
 			dockerImage := result[0].(string)
 			port := result[1].(string)

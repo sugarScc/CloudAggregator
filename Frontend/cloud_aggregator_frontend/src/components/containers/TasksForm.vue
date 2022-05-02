@@ -51,6 +51,11 @@ export default {
       })
         .then((txHash) => {
           console.log(txHash)
+          this.$notify({
+            title: 'Success',
+            message: 'Successfully send 0.01 ETH to broker',
+            type: 'success'
+          })
           // 调用后端接口创建新的任务
           let body = {
             'user_address': this.Global.AccountAddress,
@@ -59,7 +64,20 @@ export default {
             'flag_message': this.form.LivenessProbeResult,
             'url': this.form.Path
           }
-          axios.post('/api/v1/transaction', body)
+          axios.post('/api/v1/transaction', body).then((response) => {
+            console.log(response)
+            this.$notify({
+              title: 'Success',
+              message: 'transaction start successfully:' + response.data.Data,
+              type: 'success'
+            })
+          }).catch((error) => {
+            console.log(error)
+            this.$notify.error({
+              title: 'Error',
+              message: 'transaction start failed:' + error
+            })
+          })
         })
         .catch((error) => console.log(error))
     },
@@ -73,3 +91,9 @@ export default {
   }
 }
 </script>
+<style>
+.el-notification {
+  width: 600px !important;
+  height: 100px !important;
+}
+</style>

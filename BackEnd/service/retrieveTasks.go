@@ -29,22 +29,23 @@ func RetrieveAllUnfinishedTasks() {
 	fmt.Printf("%+vo", results)
 }
 
-func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks) {
+func RetrieveTasksFromUser(userAddress string) (interface{}, error) {
 	client, _ := utils.GetClientAndAuth()
 
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := store.NewCloudAggregatorCaller(address, client)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	results, err := instance.RetrieveTasksInfoFromTargetUser(nil, common.HexToAddress(userAddress))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	length := len(results.CreationTimeStamps)
 
+	var tasks vo.Tasks
 	for index := 0; index < length; index++ {
 		task := vo.Task{}
 		task.TransactionId = results.TransactionIds[index].Int64()
@@ -64,5 +65,5 @@ func RetrieveTasksFromUser(userAddress string) (tasks vo.Tasks) {
 		tasks = append(tasks, task)
 	}
 
-	return tasks
+	return tasks, nil
 }

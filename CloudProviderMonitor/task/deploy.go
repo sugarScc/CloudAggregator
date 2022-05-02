@@ -37,7 +37,7 @@ func commitTask(transactionId int64) {
 	address := common.HexToAddress(env.ContractAddress)
 	instance, err := CloudAggregator.NewCloudAggregatorTransactor(address, client)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
 	}
 	result, err := exec.Command("curl", "ifconfig.me").Output()
 	if err != nil {

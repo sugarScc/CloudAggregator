@@ -11,7 +11,7 @@
         <el-result v-if="scope.row.state==='Canceled'" icon="info"></el-result>
       </template>
     </el-table-column>
-    <el-table-column prop="creation_time_stamps" label="CreationTime" width="120">
+    <el-table-column prop="creation_time_stamps" label="CreationTime" width="150">
     </el-table-column>
     <el-table-column prop="docker_image" label="DockerImage" width="200">
     </el-table-column>
@@ -48,6 +48,7 @@ export default {
         for (let i = 0; i < response.data.Data.length; i++) {
           console.log(response.data.Data[i])
           this.tableData.push(response.data.Data[i])
+          this.tableData[i].creation_time_stamps = new Date(this.tableData[i].creation_time_stamps * 1000).toDateString();
         }
         console.log(this.tableData)
       }
@@ -58,9 +59,18 @@ export default {
       axios.put('/api/v1/withdraw/transactionId/' + transacrtionId + '/user/' + this.Global.AccountAddress).then(
         response => {
           console.log(response)
+          this.$notify({
+            title: 'Success',
+            message: 'transaction start successfully:' + response.data.Data,
+            type: 'success'
+          })
         }
       ).catch(error => {
         console.log(error)
+        this.$notify.error({
+          title: 'Error',
+          message: 'transaction start failed' + error
+        })
       })
     }
   }
