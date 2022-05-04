@@ -13,6 +13,30 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     bytes32 public finished;
     uint public count;
     string public result;
+    address[] public providers;
+    mapping(address => bytes32) public providersToName;
+    mapping(bytes32 => uint) public providersToSLA;
+
+    mapping(address => uint) public rewardedUser;
+    //the Metrics is network latency. and the SLA is only from 1-5
+    mapping(bytes32 => uint[]) public providerSLAMetrics;
+    MetricsInformation[] public dockerToProviderMetrics;
+    mapping(bytes32 => address) public dockerToProvider;
+    mapping(bytes32 => uint) public providerCalRound;
+    mapping(bytes32 => uint) public providerDeposit;
+    uint public totalRewardPool;
+
+    struct MetricsInformation {
+        // dockerImage label
+        address metricsProvider;
+        bytes32 AimCloudProvider;
+        uint metrics;
+        // which round do this metrics provider engaged in
+        uint round;
+    }
+
+
+
     enum State {Waiting, Failed, Succeeded, Canceled}
 
     // the Information of Job
@@ -174,6 +198,63 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
         return (dockerImages, ports, transactionIds);
     }
 
+    function providerRegister(bytes32 providerName, uint SLALevel) external {
+        //用于注册云服务商
+        providersToName[msg.sender] = providerName;
+        providersToSLA[providerName] = SLALevel;
+    }
+
+    function metricsCollection(string calldata dockerImage, bytes32 providerName, uint SLAMetrics) public payable{
+        //for now, the threshold is 100
+        require(providerSLAMetrics[providerName].length <= 100);
+        providerSLAMetrics[providerName].push(SLAMetrics);
+        uint total = 0;
+        if (providerSLAMetrics[providerName].length == 100) {
+            //calculate the SLAMetrics and adjust it
+            for (uint index = 0; index < 100; index++) {
+                total = total + providerSLAMetrics[providerName][index];
+            }
+            uint averageLatency = total / 100;
+            if (averageLatency > 1000) {
+                total = 5;
+            } else if (averageLatency > 500) {
+                total = 4;
+            } else if (averageLatency > 200) {
+                total = 3;
+            } else if (averageLatency > 100) {
+                total = 2;
+            } else if (averageLatency > 50) {
+                total = 1;
+            }
+            delete providerSLAMetrics[providerName];
+            //deduct the deposit for all lying provider
+            if (providersToSLA[providerName] < total) {
+                if (total == 2) {
+                    totalRewardPool += providerDeposit[providerName] - 14;
+                }
+                if (total == 3) {
+                    totalRewardPool += providerDeposit[providerName] - 5;
+                }
+                if (total == 4) {
+                    totalRewardPool += providerDeposit[providerName] - 2;
+                }
+                if (total == 5) {
+                    totalRewardPool += providerDeposit[providerName] - 1;
+                }
+                providersToSLA[providerName] = total;
+            }
+            uint rewardAmount = totalRewardPool / 10000;
+            //calculate for all the eligible user to get the reward
+            for (uint index = 0; index < dockerToProviderMetrics.length; index++) {
+                if (dockerToProviderMetrics[index].round == providerCalRound[providerName]) {
+                    if ((dockerToProviderMetrics[index].metrics*7)/ 10 > averageLatency  && (dockerToProviderMetrics[index].metrics*13) /10 < averageLatency) {
+                        payable(dockerToProviderMetrics[index].metricsProvider).transfer(rewardAmount);
+                    }
+                }
+            }
+            providerCalRound[providerName] = providerCalRound[providerName] + 1;
+        }
+    }
 
     // customer calls this function and return the money to customer
     function returnMoneyBack(uint transactionId) external payable {
@@ -206,11 +287,21 @@ contract SimplePaymentChannel is ChainlinkClient, Console {
     function commitTask(string calldata ipAddress, uint transactionId) external {
         // check the transactionId is available and set the requestId into it
         require(tidToTransaction[transactionId].creationTimeStamp != 0);
+        // find the 1st ranked provider
+        address _1stProvider = providers[0];
+        uint index;
+        for (index = 0; index < providers.length; index++) {
+            if (providersToSLA[providersToName[providers[index]]] > providersToSLA[providersToName[_1stProvider]]) {
+                _1stProvider = providers[index];
+            }
+        }
+        //这个地方要求只能是排名第一的云服务商来参与部署镜像
+        require(_1stProvider == msg.sender);
+        // we prevent any unqualified cloud service provider in here
         tidToTransaction[transactionId].cloudProvider = payable(msg.sender);
 
         // find this transaction in customerToTransactions
         Transaction[] memory transactions = customerToTransactions[tidToTransaction[transactionId].customer];
-        uint index = 0;
         for (; index < transactions.length; index++) {
             if (transactions[index].transactionId == transactionId) {
                 break;
